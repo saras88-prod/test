@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-sample-app
+  namespace: default
+  labels:
+    app: my-sample-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: my-sample-app
+  template:
+    metadata:
+      labels:
+        app: my-sample-app
+    spec:
+      containers:
+        - name: my-sample-app
+          image: 118187397376.dkr.ecr.us-east-1.amazonaws.com/brain-tasks-app
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "250m"
+              memory: "256Mi"
+          env:
+            - name: ENVIRONMENT
+              value: "production"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-sample-app-service
+  namespace: default
+spec:
+  type: LoadBalancer  # Use ClusterIP for internal-only
+  selector:
+    app: my-sample-app
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
